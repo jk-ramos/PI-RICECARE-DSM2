@@ -1,0 +1,160 @@
+<%- include('partials/header.ejs') %>
+<%- include('partials/navbar.ejs') %>
+
+<!-- Container principal -->
+<div class="upload-container">
+    <h1>Upload de Imagem</h1>
+    <p>Aqui, você pode fazer o upload de uma imagem do arroz. Assim, nossa Inteligência Artificial vai identificar se há alguma doença nele.</p>
+
+    <div class="upload-area-container">
+        <!-- Área de Upload -->
+        <button class="upload-area">
+            <img src="../img/vector.png" alt="linha" class="upload-img">
+            <label for="fileInput" class="upload-label">
+                Clique aqui ou arraste e solte arquivos de imagem para fazer Upload.
+            </label>
+            <input type="file" id="fileInput" name="images" multiple>
+        </button>
+        
+
+        <!-- Lista de Arquivos -->
+        <div class="file-button-img">
+            <h3>Fazendo Upload</h3>
+            <div class="file-list" id="fileList">
+                
+                <!-- O título vai ser atualizado dinamicamente -->
+            </div>
+
+            
+            <!-- Botões -->
+            <div class="action-buttons">
+                <button class="clear-btn" onclick="clearFiles()">Limpar Imagens</button>
+                <button class="submit-btn" onclick="submitUpload()">Salvar e Diagnosticar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    let activeUploads = 0; // Rastreamento de uploads ativos
+
+    // Event listener para o upload de arquivos
+    fileInput.addEventListener('change', (event) => {
+        const files = Array.from(event.target.files);
+        activeUploads += files.length;
+
+        // Exibe o título "Fazendo Upload" se houver arquivos
+        const title = document.createElement('h3');
+        title.textContent = '';
+        fileList.innerHTML = ''; // Limpa a lista de arquivos antes de adicionar os novos
+        fileList.appendChild(title);
+
+        files.forEach(file => {
+            const fileSizeMb = (file.size / (1024 * 1024)).toFixed(2); // Converte tamanho para MB
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <div class="file-details">
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size"> ${fileSizeMb} Mb</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar"></div>
+                    <span class="progress-text">0% concluído</span>
+                </div>
+                <button class="cancel-btn" onclick="removeFile(this)"><img src="../img/vector.svg" alt=""></button>
+            `;
+            fileList.appendChild(fileItem);
+
+            // Simula o progresso
+            simulateProgress(
+                fileItem.querySelector('.progress-bar'),
+                fileItem.querySelector('.progress-text'),
+                fileItem.querySelector('.upload-speed')
+            );
+        });
+    });
+
+    // Função que simula o progresso do upload
+    function simulateProgress(progressBar, progressText, uploadSpeed) {
+        let progress = 0;
+        const speed = Math.floor(Math.random() * 200 + 50); // Simula velocidade de upload
+        const interval = setInterval(() => {
+            if (progress >= 100) {
+                clearInterval(interval);
+                progressText.textContent = 'Concluído';
+                uploadSpeed.textContent = '0Kb/s';
+                activeUploads -= 1; // Decrementa uploads ativos
+                updateUploadTitle();
+            } else {
+                progress += 10;
+                progressBar.style.width = `${progress}%`;
+                progressText.textContent = `${progress}% concluído`;
+                uploadSpeed.textContent = `${speed}Kb/s`;
+            }
+        }, 300);
+    }
+
+    // Função para remover um arquivo da lista
+    function removeFile(button) {
+        const fileItem = button.closest('.file-item');
+        fileItem.remove();
+        activeUploads -= 1; // Decrementa ao cancelar
+        updateUploadTitle();
+    }
+
+    // Atualiza o título "Fazendo Upload" dependendo do número de uploads ativos
+    function updateUploadTitle() {
+        const title = fileList.querySelector('h3');
+        if (activeUploads > 0) {
+            title.style.display = 'block'; // Mostra o título
+        } else {
+            title.style.display = 'none'; // Esconde quando não há uploads
+        }
+    }
+
+    // Função para limpar os arquivos
+    function clearFiles() {
+        fileList.innerHTML = ''; // Limpa a lista de arquivos
+        activeUploads = 0; // Reseta o contador de uploads ativos
+        updateUploadTitle();
+    }
+
+    // Função para simular o envio de arquivos
+    function submitUpload() {
+    const formData = new FormData();
+    const files = fileInput.files;
+
+    if (files.length === 0) {
+        alert('Por favor, selecione pelo menos uma imagem.');
+        return;
+    }
+
+    // Adicionar arquivos ao FormData
+    Array.from(files).forEach(file => {
+        formData.append('images', file);
+    });
+
+    // Enviar para o backend
+    fetch('/upload', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => {
+        if (response.ok) {
+            alert('Imagens enviadas com sucesso!');
+            window.location.href = '/diagnostico'; // Redireciona para a página de diagnósticos
+        } else {
+            response.text().then(text => alert(`Erro ao enviar imagens: ${text}`));
+        }
+    })
+    .catch(error => {
+        console.error('Erro no envio:', error);
+        alert('Ocorreu um erro ao enviar as imagens.');
+    });
+}
+
+</script>

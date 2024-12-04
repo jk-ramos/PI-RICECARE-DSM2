@@ -1,0 +1,61 @@
+<%- include ('partials/header.ejs') %>
+<%- include ('partials/navbar.ejs') %>
+
+<div class="diagnostico-container">
+    <h1>Diagnósticos</h1>
+    <p>Aqui, você encontra todas as informações acerca dos seus diagnósticos realizados.</p>
+
+    <div class="diagnosticos-grid">
+        <% if (diagnosticos.length > 0) { %>
+            <% diagnosticos.forEach(diagnostico => { %>
+                <div class="card">
+                    <div class="card-header">
+                        <h2><%= diagnostico.upload.nome_arquivo %></h2>
+                        <p class="nivel">Realizado em <%= new Date(diagnostico.upload.data_upload).toLocaleDateString() %></p>
+                    </div>
+                    <div class="card-body">
+                        <p>Nível de Infecção:</p>
+                        <p class="nivel"><%= diagnostico.nivel_infeccao || 'Não analisado' %></p>
+                        <p>Recomendações:</p>
+                        <div class="recomendacoes-container">
+                            <ul>
+                                <% if (diagnostico.recomendacoes) { %>
+                                    <% diagnostico.recomendacoes.split(',').forEach(recomendacao => { %>
+                                        <li><%= recomendacao.trim() %></li>
+                                    <% }); %>
+                                <% } else { %>
+                                    <li>Sem recomendações disponíveis</li>
+                                <% } %>
+                            </ul>
+                            <% if (diagnostico.upload.caminho) { %>
+                                <img src="<%= diagnostico.upload.caminho %>" alt="<%= diagnostico.upload.nome_arquivo %>">
+                            <% } %>                                                       
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>Nenhum diagnóstico disponível.</p>
+        <% } %>
+    </div>
+    
+    
+    
+    <div class="reco-button">
+        <div class="novo-upload-container">
+            <button id="btn-novo-upload" onclick="location.href='/upload'">+ Novo Upload</button>
+        </div>
+        
+        <!-- Painel de Recomendações -->
+        <div class="recomendacoes-panel">
+            <h2>Recomendações</h2>
+            <p>Quando a planta do arroz se encontra infectada, existem algumas recomendações a serem tomadas para evitar que a doença se espalhe:</p>
+            <ul>
+                <li>Melhoria na adubação da planta do arroz;</li>
+                <li>Aumento no espaçamento entre plantas durante o plantio;</li>
+                <li>Controle químico para sementes;</li>
+                <li>Pulverização aérea de toda a área de plantação.</li>
+            </ul>
+        </div>
+    </div>
+</div>

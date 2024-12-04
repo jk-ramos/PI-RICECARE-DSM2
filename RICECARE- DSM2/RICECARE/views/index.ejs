@@ -1,0 +1,200 @@
+<%- include ('partials/header.ejs') %>
+<%- include ('partials/navbar.ejs') %>
+
+<div class="dashboard-container">
+  <!-- Cards Topo -->
+  <div class="dashboard-top">
+    <!-- Card Dashboard -->
+    <section class="card-dashboard">
+      <div class="dash-card-body">
+        <div class="dash-left">
+          <h2>Boa tarde!</h2>
+          <p>Thiago Ryu Funaki</p>
+          <h1>4</h1>
+          <p class="uploads">Uploads este mês</p>
+        </div>
+        <div class="dash-right">
+          <h3>Este mês</h3>
+          <h4>2</h4>
+          <p>Casos leves</p>
+          <h4>2</h4>
+          <p>Casos graves</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Card Uploads -->
+    <section class="uploads-card">
+      <div class="uploads-header">
+        <h2>Últimos Uploads de Imagem</h2>
+        <p>
+          <span id="calendar-text">Novembro/2024</span>
+          <span id="calendar-icon">&#9660;</span>
+        </p>        
+        <div class="x" onclick="location.href='/upload'">
+          <img src="../img/+.png" alt="Imagem 1" />
+      </div>      
+      </div>
+      <div class="uploads-gallery">
+        <button class="gallery-nav left">&#8249;</button>
+        <div class="gallery-images">
+          <img src="../img/brusone1.jpg" alt="Imagem 1" />
+          <img src="../img/brusone2.jpg" alt="Imagem 2" />
+          <img src="../img/brusone3.jpg" alt="Imagem 3" />
+          <img src="../img/brusone4.jpg" alt="Imagem 4" />
+        </div>
+        <button class="gallery-nav right">&#8250;</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Card Diagnósticos -->
+  <div class="dashboard-lateral">
+    <!-- Card Diagnósticos -->
+    <div class="card-diagnosticos">
+      <h3>Últimos Diagnósticos</h3>
+      <p> <span id="calendar-text">Novembro/2024</span>
+        <span id="calendar-icon">&#9660;</span></p>
+      <div class="item">
+        <span>Brusone1 - Identificado via upload</span>
+        <span>04-11-2024</span>
+      </div>
+      <div class="item">
+        <span>Brusone2 - Identificado via upload</span>
+        <span>04-11-2024</span>
+      </div>
+      <div class="item">
+        <span>Brusone3 - Identificado via upload</span>
+        <span>04-11-2024</span>
+      </div>
+      <div class="item">
+        <span>Brusone4 - Identificado via upload</span>
+        <span>04-11-2024</span>
+      </div>
+    </div>
+  
+    <!-- Gráfico Visão Geral -->
+    <div class="grafico-visao-geral">
+      <h3>Visão Geral</h3>
+      <canvas id="graficoVisaoGeral" width="470" height="300"></canvas>
+    </div>
+
+    
+    <script>
+
+//CARROSSEL
+document.addEventListener("DOMContentLoaded", () => {
+  const gallery = document.querySelector(".gallery-images");
+  const leftButton = document.querySelector(".gallery-nav.left");
+  const rightButton = document.querySelector(".gallery-nav.right");
+
+  const scrollAmount = 190; // Altere este valor se quiser ajustar a quantidade de rolagem
+
+  leftButton.addEventListener("click", () => {
+    gallery.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+  });
+
+  rightButton.addEventListener("click", () => {
+    gallery.scrollBy({ left: scrollAmount, behavior: "smooth" });
+  });
+});
+
+    //CALENDARIO
+    const ctx = document.getElementById('graficoVisaoGeral').getContext('2d');
+
+new Chart(ctx, {
+  type: 'line', // Gráfico de linha
+  data: {
+    labels: ['Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'], // Meses no eixo X
+    datasets: [
+      {
+        label: 'Casos Leves',
+        data: [5, 7, 9, 12, 15, 18], // Dados fictícios para casos leves
+        borderColor: '#36630C', // Tom de verde mais escuro
+        backgroundColor: 'rgba(118, 185, 71, 0.4)', // Tom de verde mais escuro para o fundo
+        borderWidth: 4,
+        tension: 0.4,
+        pointBackgroundColor: '#131413',
+        pointBorderColor: '#36630C',
+        pointRadius: 6,
+      },
+      {
+        label: 'Casos Graves',
+        data: [3, 4, 6, 10, 14, 17], // Dados fictícios para casos graves
+        borderColor: '#EB4B39', // Linha vermelha
+        backgroundColor: 'rgba(229, 95, 80, 0.4)', // Preenchimento abaixo da linha
+        borderWidth: 4,
+        tension: 0.4,
+        pointBackgroundColor: '#131413',
+        pointBorderColor: '#EB4B39',
+        pointRadius: 6,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true, // Exibe a legenda
+        labels: {
+          color: '#fff',
+          font: {
+            size: 14,
+            family: 'Poppins',
+          },
+        },
+      },
+      tooltip: {
+        callbacks: {
+          title: function (tooltipItems) {
+            return `Mês: ${tooltipItems[0].label}`; // Mostra o mês
+          },
+          label: function (tooltipItem) {
+            return `${tooltipItem.dataset.label}: ${tooltipItem.raw} casos`;
+          },
+        },
+        backgroundColor: '#333',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        borderColor: '#fff',
+        borderWidth: 1,
+      },
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+        ticks: {
+          color: '#99E550',
+          font: {
+            size: 14,
+            family: 'Poppins',
+          },
+        },
+      },
+      y: {
+        min: 2, // Começa do valor 2 no eixo Y
+        max: 20, // Vai até o valor 20 no eixo Y
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)',
+        },
+        ticks: {
+          stepSize: 2, // Incrementa de 2 em 2
+          color: '#99E550',
+          font: {
+            size: 14,
+            family: 'Poppins',
+          },
+        },
+      },
+    },
+  },
+});
+
+
+
+
+</script>
+
+</div>
